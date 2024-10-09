@@ -3,10 +3,9 @@ import numpy as np
 import time
 
 # Helper function to display the Sudoku board
-def display_board(board):
-    st.write("### Current Sudoku Board")
+def display_board(board, placeholder):
     board_display = np.array(board)
-    st.dataframe(board_display)
+    placeholder.table(board_display)
 
 # Check if a number can be placed in the specified position
 def is_safe(board, row, col, num):
@@ -28,7 +27,7 @@ def is_safe(board, row, col, num):
     return True
 
 # Backtracking function to solve the Sudoku
-def solve_sudoku(board, visualize=False):
+def solve_sudoku(board, visualize=False, placeholder=None):
     for row in range(9):
         for col in range(9):
             if board[row][col] == 0:  # Empty cell
@@ -36,15 +35,19 @@ def solve_sudoku(board, visualize=False):
                     if is_safe(board, row, col, num):
                         board[row][col] = num
                         
-                        if visualize:
-                            display_board(board)
+                        if visualize and placeholder:
+                            display_board(board, placeholder)  # Update the board in place
                             time.sleep(0.2)  # Pause for visualization
 
-                        if solve_sudoku(board, visualize):
+                        if solve_sudoku(board, visualize, placeholder):
                             return True
 
                         # Backtrack
                         board[row][col] = 0
+
+                        if visualize and placeholder:
+                            display_board(board, placeholder)  # Update the board in place
+                            time.sleep(0.2)
 
                 return False
 
@@ -52,7 +55,7 @@ def solve_sudoku(board, visualize=False):
 
 # Streamlit app
 def main():
-    st.title("Sudoku Solver with Visualization")
+    st.title("Sudoku Solver with In-Place Visualization")
 
     st.write("### Input a 2D array representing the Sudoku (9x9)")
     input_text = st.text_area(
@@ -75,13 +78,18 @@ def main():
         # Button to solve the Sudoku
         if st.button("Solve"):
             st.write("### Solving Sudoku...")
+
             visualize_process = st.checkbox("Visualize solving process", value=True)
 
-            if solve_sudoku(sudoku_board, visualize=visualize_process):
+            # Placeholder for visualizing the board
+            board_placeholder = st.empty()
+
+            if solve_sudoku(sudoku_board, visualize=visualize_process, placeholder=board_placeholder):
                 st.write("### Sudoku Solved Successfully!")
-                display_board(sudoku_board)
+                display_board(sudoku_board, board_placeholder)  # Final solution display
             else:
                 st.write("### No Solution exists for the given Sudoku")
+
     except Exception as e:
         st.error(f"Error parsing the input. Make sure it's a valid 9x9 2D list format.\nError: {e}")
 
