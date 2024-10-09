@@ -54,40 +54,36 @@ def solve_sudoku(board, visualize=False):
 def main():
     st.title("Sudoku Solver with Visualization")
 
-    # Input grid (can be modified to take a user input)
-    default_sudoku = [
-        [5, 3, 0, 0, 7, 0, 0, 0, 0],
-        [6, 0, 0, 1, 9, 5, 0, 0, 0],
-        [0, 9, 8, 0, 0, 0, 0, 6, 0],
-        [8, 0, 0, 0, 6, 0, 0, 0, 3],
-        [4, 0, 0, 8, 0, 3, 0, 0, 1],
-        [7, 0, 0, 0, 2, 0, 0, 0, 6],
-        [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 4, 1, 9, 0, 0, 5],
-        [0, 0, 0, 0, 8, 0, 0, 7, 9]
-    ]
+    st.write("### Input a 2D array representing the Sudoku (9x9)")
+    input_text = st.text_area(
+        "Enter the Sudoku as a Python-style 2D list (use 0 for empty cells):", 
+        value="[[5, 3, 0, 0, 7, 0, 0, 0, 0],\n"
+              "[6, 0, 0, 1, 9, 5, 0, 0, 0],\n"
+              "[0, 9, 8, 0, 0, 0, 0, 6, 0],\n"
+              "[8, 0, 0, 0, 6, 0, 0, 0, 3],\n"
+              "[4, 0, 0, 8, 0, 3, 0, 0, 1],\n"
+              "[7, 0, 0, 0, 2, 0, 0, 0, 6],\n"
+              "[0, 6, 0, 0, 0, 0, 2, 8, 0],\n"
+              "[0, 0, 0, 4, 1, 9, 0, 0, 5],\n"
+              "[0, 0, 0, 0, 8, 0, 0, 7, 9]]"
+    )
 
-    # Convert default_sudoku to editable input
-    sudoku_input = []
-    for row in range(9):
-        row_input = []
-        for col in range(9):
-            row_input.append(st.number_input(f"Cell ({row+1},{col+1})", min_value=0, max_value=9, value=default_sudoku[row][col]))
-        sudoku_input.append(row_input)
+    try:
+        # Parse the input text as a Python list
+        sudoku_board = eval(input_text)
 
-    # Button to solve the Sudoku
-    if st.button("Solve"):
-        # Deep copy the input to avoid modifying original array
-        sudoku_board = np.array(sudoku_input)
+        # Button to solve the Sudoku
+        if st.button("Solve"):
+            st.write("### Solving Sudoku...")
+            visualize_process = st.checkbox("Visualize solving process", value=True)
 
-        st.write("### Solving Sudoku...")
-        visualize_process = st.checkbox("Visualize solving process", value=True)
-
-        if solve_sudoku(sudoku_board, visualize=visualize_process):
-            st.write("### Sudoku Solved Successfully!")
-            display_board(sudoku_board)
-        else:
-            st.write("### No Solution exists for the given Sudoku")
+            if solve_sudoku(sudoku_board, visualize=visualize_process):
+                st.write("### Sudoku Solved Successfully!")
+                display_board(sudoku_board)
+            else:
+                st.write("### No Solution exists for the given Sudoku")
+    except Exception as e:
+        st.error(f"Error parsing the input. Make sure it's a valid 9x9 2D list format.\nError: {e}")
 
 if __name__ == "__main__":
     main()
